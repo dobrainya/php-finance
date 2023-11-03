@@ -2,31 +2,27 @@
 
 namespace App\Controller;
 
-use App\Entity\Amount;
 use App\Entity\Reference;
-use App\Repository\AmountRepository;
 use App\Repository\ReferenceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/api', name: 'api_')]
 class IndexController extends AbstractController
 {
     private ReferenceRepository $referenceRepository;
-    private AmountRepository $amountRepository;
 
     /**
      * @param ReferenceRepository $referenceRepository
-     * @param AmountRepository $amountRepository
      */
-    public function __construct(ReferenceRepository $referenceRepository, AmountRepository $amountRepository)
+    public function __construct(ReferenceRepository $referenceRepository)
     {
         $this->referenceRepository = $referenceRepository;
-        $this->amountRepository = $amountRepository;
     }
 
-    #[Route('/references', name: 'app_references')]
-    public function references(): JsonResponse
+    #[Route('/refs', name: 'app_references')]
+    public function refs(): JsonResponse
     {
         $data = $this->referenceRepository->findAll();
 
@@ -37,41 +33,5 @@ class IndexController extends AbstractController
                 'code' => $reference->getCode(),
             ];
         }, $data));
-    }
-
-    #[Route('/incomes', name: 'app_incomes')]
-    public function incomes(): JsonResponse
-    {
-        return $this->json($this->getAmountsByCategory('inc'));
-    }
-
-    #[Route('/expenses', name: 'app_expenses')]
-    public function expenses(): JsonResponse
-    {
-        return $this->json($this->getAmountsByCategory('exp'));
-    }
-
-    private function getAmountsByCategory(string $category): array
-    {
-        $reference = $this->referenceRepository->findOneBy([
-            'code' => $category,
-        ]);
-
-        if (!$reference) {
-            throw new \RuntimeException("Reference {$category} not found");
-        }
-
-        $data = $this->amountRepository->findBy([
-            'type' => $reference,
-        ]);
-
-        return array_map(static function (Amount $amount) {
-            return [
-                'id' => $amount->getId(),
-                'name' => $amount->getName(),
-                'amount' => $amount->getAmount(),
-                'createdAt' => $amount->getCreatedAt(),
-            ];
-        }, $data);
     }
 }
