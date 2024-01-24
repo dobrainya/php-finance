@@ -14,17 +14,10 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/amount', name: 'api_amount_')]
 class AmountController extends AbstractController
 {
-    private ReferenceRepository $referenceRepository;
-    private AmountRepository $amountRepository;
-
-    /**
-     * @param ReferenceRepository $referenceRepository
-     * @param AmountRepository $amountRepository
-     */
-    public function __construct(ReferenceRepository $referenceRepository, AmountRepository $amountRepository)
+    public function __construct(
+        private readonly ReferenceRepository $referenceRepository,
+        private readonly AmountRepository $amountRepository)
     {
-        $this->referenceRepository = $referenceRepository;
-        $this->amountRepository = $amountRepository;
     }
 
     #[Route('/incomes', name: 'incomes_', methods: ['get'])]

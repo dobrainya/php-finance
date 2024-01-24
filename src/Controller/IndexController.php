@@ -11,14 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'api_')]
 class IndexController extends AbstractController
 {
-    private ReferenceRepository $referenceRepository;
-
-    /**
-     * @param ReferenceRepository $referenceRepository
-     */
-    public function __construct(ReferenceRepository $referenceRepository)
+    public function __construct(private readonly ReferenceRepository $referenceRepository)
     {
-        $this->referenceRepository = $referenceRepository;
     }
 
     #[Route('/refs', name: 'app_references')]
@@ -33,5 +27,13 @@ class IndexController extends AbstractController
                 'code' => $reference->getCode(),
             ];
         }, $data));
+    }
+
+    #[Route('/test', name: 'app_references_tt')]
+    public function test(): JsonResponse
+    {
+        $data = $this->referenceRepository->findAll();
+
+        return $this->json($data);
     }
 }
