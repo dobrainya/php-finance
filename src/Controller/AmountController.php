@@ -32,6 +32,10 @@ class AmountController extends AbstractController
         return $this->json($this->getAmountsByCategory('exp'));
     }
 
+    /**
+     * @param string $category
+     * @return mixed[]
+     */
     private function getAmountsByCategory(string $category): array
     {
         $reference = $this->referenceRepository->findOneBy([
@@ -58,7 +62,7 @@ class AmountController extends AbstractController
     }
 
     #[Route('/create', name: 'create_', methods: ['post'])]
-    public function create(Request $request, EntityManagerInterface $entityManager)
+    public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $reference = $this->referenceRepository->findOneBy([
             'code' => $request->request->get('type'),
@@ -96,7 +100,7 @@ class AmountController extends AbstractController
         requirements: ['id' => '\d+'],
         methods: ['post'],
     )]
-    public function update(Amount $amount, Request $request, EntityManagerInterface $entityManager)
+    public function update(Amount $amount, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $amount->setName($request->request->get('name'));
         $amount->setAmount($request->request->get('amount'));
