@@ -48,11 +48,11 @@ class AmountController extends AbstractController
 
         return array_map(static function (Amount $amount) {
             return [
-                'id'        => $amount->getId(),
-                'name'      => $amount->getName(),
-                'amount'    => $amount->getAmount(),
+                'id' => $amount->getId(),
+                'name' => $amount->getName(),
+                'amount' => $amount->getAmount(),
                 'createdAt' => $amount->getCreatedAt(),
-                'type'      => $amount->getType()->getCode(),
+                'type' => $amount->getType()->getCode(),
             ];
         }, $data);
     }
@@ -82,11 +82,11 @@ class AmountController extends AbstractController
         $entityManager->flush();
 
         return $this->json([
-            'id'        => $amount->getId(),
-            'name'      => $amount->getName(),
-            'amount'    => $amount->getAmount(),
+            'id' => $amount->getId(),
+            'name' => $amount->getName(),
+            'amount' => $amount->getAmount(),
             'createdAt' => $amount->getCreatedAt(),
-            'type'      => $amount->getType()->getCode(),
+            'type' => $amount->getType()->getCode(),
         ]);
     }
 
