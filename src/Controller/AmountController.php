@@ -3,8 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Amount;
-use App\Repository\AmountRepository;
-use App\Repository\ReferenceRepository;
+use App\Exception\BadParamsException;
+use App\Model\AmountListResponse;
+use App\Service\AmountService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,84 +15,43 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/amount', name: 'api_amount_')]
 class AmountController extends AbstractController
 {
-    public function __construct(
-        private readonly ReferenceRepository $referenceRepository,
-        private readonly AmountRepository $amountRepository)
+    public function __construct(private readonly AmountService $amountService)
     {
     }
 
     #[Route('/incomes', name: 'incomes_', methods: ['get'])]
     public function incomes(): JsonResponse
     {
-        return $this->json($this->getAmountsByCategory('inc'));
+        try {
+            return $this->json($this->getAmountsByCategory('inc'));
+        } catch (BadParamsException $e) {
+            return $this->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 
     #[Route('/expenses', name: 'expenses_', methods: ['get'])]
     public function expenses(): JsonResponse
     {
-        return $this->json($this->getAmountsByCategory('exp'));
+        try {
+            return $this->json($this->getAmountsByCategory('exp'));
+        } catch (BadParamsException $e) {
+            return $this->json(['success' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 
-    /**
-     * @param string $category
-     * @return mixed[]
-     */
-    private function getAmountsByCategory(string $category): array
+    private function getAmountsByCategory(string $category): AmountListResponse
     {
-        $reference = $this->referenceRepository->findOneBy([
-            'code' => $category,
-        ]);
-
-        if (!$reference) {
-            throw new \RuntimeException("Reference {$category} not found");
-        }
-
-        $data = $this->amountRepository->findBy([
-            'type' => $reference,
-        ]);
-
-        return array_map(static function (Amount $amount) {
-            return [
-                'id' => $amount->getId(),
-                'name' => $amount->getName(),
-                'amount' => $amount->getAmount(),
-                'createdAt' => $amount->getCreatedAt(),
-                'type' => $amount->getType()->getCode(),
-            ];
-        }, $data);
+        return $this->amountService->getAmountsByCategory($category);
     }
 
     #[Route('/create', name: 'create_', methods: ['post'])]
-    public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function create(Request $request): JsonResponse
     {
-        $reference = $this->referenceRepository->findOneBy([
-            'code' => $request->request->get('type'),
-        ]);
-
-        if (!$reference) {
+        try {
+            return $this->json($this->amountService->create($request));
+        } catch (BadParamsException $e) {
             return $this->json(['success' => false], 400);
         }
-
-        $amount = new Amount();
-        $amount->setCreatedAt(new \DateTime());
-
-        $name = $request->request->get('name');
-        $amount->setName($name);
-
-        $value = $request->request->get('amount');
-        $amount->setAmount($value);
-        $amount->setType($reference);
-
-        $entityManager->persist($amount);
-        $entityManager->flush();
-
-        return $this->json([
-            'id' => $amount->getId(),
-            'name' => $amount->getName(),
-            'amount' => $amount->getAmount(),
-            'createdAt' => $amount->getCreatedAt(),
-            'type' => $amount->getType()->getCode(),
-        ]);
     }
 
     #[Route(
