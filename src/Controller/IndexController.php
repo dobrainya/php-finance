@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Reference;
 use App\Repository\ReferenceRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -15,7 +16,10 @@ class IndexController extends AbstractController
     {
     }
 
-    #[Route('/refs', name: 'app_references')]
+    /**
+     * @OA\Response(response=200,description="Get references")
+     */
+    #[Route('/refs', name: 'app_references', methods: ['get'])]
     public function refs(): JsonResponse
     {
         $data = $this->referenceRepository->findAll();
@@ -27,13 +31,5 @@ class IndexController extends AbstractController
                 'code' => $reference->getCode(),
             ];
         }, $data));
-    }
-
-    #[Route('/test', name: 'app_references_tt')]
-    public function test(): JsonResponse
-    {
-        $data = $this->referenceRepository->findAll();
-
-        return $this->json($data);
     }
 }

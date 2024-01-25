@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Amount;
-use App\Exception\BadParamsException;
+use App\Exception\IncorrectCategoryException;
 use App\Model\AmountItem;
 use App\Model\AmountItemResponse;
 use App\Model\AmountListResponse;
@@ -28,7 +28,7 @@ class AmountService
         ]);
 
         if (!$reference) {
-            throw new BadParamsException("Reference {$category} not found");
+            throw new IncorrectCategoryException();
         }
 
         $data = $this->amountRepository->findBy(['type' => $reference]);
@@ -50,7 +50,7 @@ class AmountService
         ]);
 
         if (!$reference) {
-            throw new BadParamsException("Reference {$category} not found");
+            throw new IncorrectCategoryException();
         }
 
         $amount = new Amount();

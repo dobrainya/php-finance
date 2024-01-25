@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Amount;
-use App\Exception\BadParamsException;
+use App\Exception\IncorrectCategoryException;
 use App\Model\AmountListResponse;
 use App\Service\AmountService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,6 +11,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Annotations as OA;
+use Nelmio\ApiDocBundle\Annotation\Model;
 
 #[Route('/api/amount', name: 'api_amount_')]
 class AmountController extends AbstractController
@@ -19,22 +21,28 @@ class AmountController extends AbstractController
     {
     }
 
+    /**
+     * @OA\Response(response=200, description="Get list of incomes", @Model(type=AmountListResponse::class))
+     */
     #[Route('/incomes', name: 'incomes_', methods: ['get'])]
     public function incomes(): JsonResponse
     {
         try {
             return $this->json($this->getAmountsByCategory('inc'));
-        } catch (BadParamsException $e) {
+        } catch (IncorrectCategoryException $e) {
             return $this->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
 
+    /**
+     * @OA\Response(response=200, description="Get list of expenses", @Model(type=AmountListResponse::class))
+     */
     #[Route('/expenses', name: 'expenses_', methods: ['get'])]
     public function expenses(): JsonResponse
     {
         try {
             return $this->json($this->getAmountsByCategory('exp'));
-        } catch (BadParamsException $e) {
+        } catch (IncorrectCategoryException $e) {
             return $this->json(['success' => false, 'message' => $e->getMessage()], 400);
         }
     }
@@ -49,7 +57,7 @@ class AmountController extends AbstractController
     {
         try {
             return $this->json($this->amountService->create($request));
-        } catch (BadParamsException $e) {
+        } catch (IncorrectCategoryException $e) {
             return $this->json(['success' => false], 400);
         }
     }
