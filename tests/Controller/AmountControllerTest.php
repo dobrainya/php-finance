@@ -14,7 +14,7 @@ class AmountControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/Responses/AmountControllerTest_testGetIncomes.json',
+            __DIR__.'/Responses/AmountControllerTest_testGetIncomes.json',
             $responseText
         );
     }
@@ -27,7 +27,7 @@ class AmountControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonStringEqualsJsonFile(
-            __DIR__ . '/Responses/AmountControllerTest_testGetExpenses.json',
+            __DIR__.'/Responses/AmountControllerTest_testGetExpenses.json',
             $responseText
         );
     }

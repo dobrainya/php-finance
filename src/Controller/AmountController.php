@@ -28,7 +28,7 @@ class AmountController extends AbstractController
     public function incomes(): JsonResponse
     {
         try {
-            return $this->json($this->getAmountsByCategory('inc'));
+            return $this->json($this->amountService->getAmountsByCategory('inc'));
         } catch (CategoryNotFoundException $e) {
             return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
         }
@@ -41,15 +41,10 @@ class AmountController extends AbstractController
     public function expenses(): JsonResponse
     {
         try {
-            return $this->json($this->getAmountsByCategory('exp'));
+            return $this->json($this->amountService->getAmountsByCategory('exp'));
         } catch (CategoryNotFoundException $e) {
             return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
         }
-    }
-
-    private function getAmountsByCategory(string $category): AmountListResponse
-    {
-        return $this->amountService->getAmountsByCategory($category);
     }
 
     #[Route('/create', name: 'create_', methods: ['post'])]

@@ -2,8 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Reference;
-use App\Repository\ReferenceRepository;
+use App\Model\ReferenceListResponse;
+use App\Service\ReferenceService;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,24 +13,21 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'api_')]
 class IndexController extends AbstractController
 {
-    public function __construct(private readonly ReferenceRepository $referenceRepository)
+    public function __construct(private readonly ReferenceService $referenceService)
     {
     }
 
     /**
-     * @OA\Response(response=200,description="Get references")
+     * @OA\Response(
+     *     response=200,
+     *     description="Get references",
+     *
+     *     @Model(type=ReferenceListResponse::class)
+     * )
      */
     #[Route('/refs', name: 'app_references', methods: ['get'])]
     public function refs(): JsonResponse
     {
-        $data = $this->referenceRepository->findAll();
-
-        return $this->json(array_map(static function (Reference $reference) {
-            return [
-                'id' => $reference->getId(),
-                'name' => $reference->getName(),
-                'code' => $reference->getCode(),
-            ];
-        }, $data));
+        return $this->json($this->referenceService->getReferences());
     }
 }
