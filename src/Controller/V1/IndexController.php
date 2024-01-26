@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\V1;
 
 use App\Model\ReferenceListResponse;
 use App\Service\ReferenceService;
@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api', name: 'api_')]
+#[Route('/api/v1', name: 'api_v1_')]
 class IndexController extends AbstractController
 {
     public function __construct(private readonly ReferenceService $referenceService)

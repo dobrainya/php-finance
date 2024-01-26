@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\V1;
 
 use App\Entity\Amount;
 use App\Exception\CategoryNotFoundException;
@@ -14,40 +14,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/amount', name: 'api_amount_')]
+#[Route('/api/v1/amount', name: 'api_v1_amount_')]
 class AmountController extends AbstractController
 {
     public function __construct(private readonly AmountService $amountService)
     {
     }
 
-    /**
-     * @OA\Response(response=200, description="Get list of incomes", @Model(type=AmountListResponse::class))
-     */
-    #[Route('/incomes', name: 'incomes_', methods: ['get'])]
-    public function incomes(): JsonResponse
-    {
-        try {
-            return $this->json($this->amountService->getAmountsByCategory('inc'));
-        } catch (CategoryNotFoundException $e) {
-            return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
-        }
-    }
-
-    /**
-     * @OA\Response(response=200, description="Get list of expenses", @Model(type=AmountListResponse::class))
-     */
-    #[Route('/expenses', name: 'expenses_', methods: ['get'])]
-    public function expenses(): JsonResponse
-    {
-        try {
-            return $this->json($this->amountService->getAmountsByCategory('exp'));
-        } catch (CategoryNotFoundException $e) {
-            return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
-        }
-    }
-
-    #[Route('/create', name: 'create_', methods: ['post'])]
+    #[Route('/', name: 'create_', methods: ['post'])]
     public function create(Request $request): JsonResponse
     {
         try {
@@ -57,8 +31,37 @@ class AmountController extends AbstractController
         }
     }
 
+    /**
+     * @OA\Response(response=200, description="Get list of incomes", @Model(type=AmountListResponse::class))
+     */
     #[Route(
-        '/update/{id}',
+        '/{category}',
+        name: 'amounts_by_category_',
+        requirements: ['category' => '(exp|inc)'],
+        methods: ['get']
+    )]
+    public function incomes(Request $request): JsonResponse
+    {
+        try {
+            return $this->json($this->amountService->getAmountsByCategory($request->attributes->get('category')));
+        } catch (CategoryNotFoundException $e) {
+            return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
+        }
+    }
+
+    #[Route(
+        '/{id}',
+        name: 'options_',
+        requirements: ['id' => '\d+'],
+        methods: ['options'],
+    )]
+    public function options(Amount $amount, Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        return $this->json('');
+    }
+
+    #[Route(
+        '/{id}',
         name: 'update_',
         requirements: ['id' => '\d+'],
         methods: ['post'],

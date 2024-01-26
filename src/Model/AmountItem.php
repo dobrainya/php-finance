@@ -10,7 +10,7 @@ class AmountItem
         private readonly int $id,
         private readonly string $name,
         private readonly float $amount,
-        private readonly \DateTimeInterface $createdAt,
+        private readonly int $createdAt,
         private readonly string $type
     ) {
     }
@@ -21,7 +21,7 @@ class AmountItem
             $amount->getId(),
             $amount->getName(),
             $amount->getAmount(),
-            $amount->getCreatedAt(),
+            $amount->getCreatedAt()->getTimestamp(),
             $amount->getType()->getCode()
         );
     }
@@ -41,7 +41,7 @@ class AmountItem
         return $this->amount;
     }
 
-    public function getCreatedAt(): \DateTimeInterface
+    public function getCreatedAt(): int
     {
         return $this->createdAt;
     }
