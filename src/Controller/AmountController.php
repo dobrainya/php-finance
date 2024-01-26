@@ -3,16 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\Amount;
-use App\Exception\IncorrectCategoryException;
+use App\Exception\CategoryNotFoundException;
 use App\Model\AmountListResponse;
 use App\Service\AmountService;
 use Doctrine\ORM\EntityManagerInterface;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use OpenApi\Annotations as OA;
-use Nelmio\ApiDocBundle\Annotation\Model;
 
 #[Route('/api/amount', name: 'api_amount_')]
 class AmountController extends AbstractController
@@ -29,8 +29,8 @@ class AmountController extends AbstractController
     {
         try {
             return $this->json($this->getAmountsByCategory('inc'));
-        } catch (IncorrectCategoryException $e) {
-            return $this->json(['success' => false, 'message' => $e->getMessage()], 400);
+        } catch (CategoryNotFoundException $e) {
+            return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
         }
     }
 
@@ -42,8 +42,8 @@ class AmountController extends AbstractController
     {
         try {
             return $this->json($this->getAmountsByCategory('exp'));
-        } catch (IncorrectCategoryException $e) {
-            return $this->json(['success' => false, 'message' => $e->getMessage()], 400);
+        } catch (CategoryNotFoundException $e) {
+            return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
         }
     }
 
@@ -57,8 +57,8 @@ class AmountController extends AbstractController
     {
         try {
             return $this->json($this->amountService->create($request));
-        } catch (IncorrectCategoryException $e) {
-            return $this->json(['success' => false], 400);
+        } catch (CategoryNotFoundException $e) {
+            return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
         }
     }
 

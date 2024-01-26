@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 use App\Entity\Amount;
 use App\Entity\Reference;
-use App\Repository\ReferenceRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
