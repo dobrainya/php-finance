@@ -1,24 +1,24 @@
 {
   "items": [
     {
-      "id": 42,
+      "id": 4,
       "name": "Taxes",
       "amount": 500,
-      "createdAt": "2024-01-24T16:21:29+03:00",
+      "createdAt": 1706346528,
       "type": "exp"
     },
     {
-      "id": 43,
+      "id": 5,
       "name": "Meals",
       "amount": 200,
-      "createdAt": "2024-01-24T16:21:29+03:00",
+      "createdAt": 1706346528,
       "type": "exp"
     },
     {
-      "id": 44,
+      "id": 6,
       "name": "Groceries",
       "amount": 60,
-      "createdAt": "2024-01-24T16:21:29+03:00",
+      "createdAt": 1706346528,
       "type": "exp"
     }
   ]

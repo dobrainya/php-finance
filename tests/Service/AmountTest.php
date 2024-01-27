@@ -4,6 +4,7 @@ namespace App\Tests\Service;
 
 use App\Entity\Amount;
 use App\Entity\Reference;
+use App\Exception\CategoryNotFoundException;
 use App\Model\AmountItem;
 use App\Model\AmountListResponse;
 use App\Repository\AmountRepository;
@@ -14,6 +15,25 @@ use PHPUnit\Framework\TestCase;
 
 class AmountTest extends TestCase
 {
+
+    public function testGetIncomesWithIncorrectCategory()
+    {
+        $refRepository = $this->createMock(ReferenceRepository::class);
+        $refRepository->expects($this->once())
+            ->method('findOneBy')
+            ->withAnyParameters()
+            ->willReturn(null);
+
+        $service = new AmountService(
+            $this->createMock(AmountRepository::class),
+            $refRepository,
+            $this->createMock(EntityManager::class)
+        );
+
+        $this->expectException(CategoryNotFoundException::class);
+        $service->getAmountsByCategory('incorrect_cat_code');
+    }
+
     public function testGetIncomesByCategory(): void
     {
         $incomeRef = (new Reference())->setId(1)->setName('Income')->setCode('inc');

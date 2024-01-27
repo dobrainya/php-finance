@@ -4,21 +4,21 @@
       "id": 39,
       "name": "Sell own car",
       "amount": 500000,
-      "createdAt": "2024-01-24T16:21:29+03:00",
+      "createdAt": 1706346528,
       "type": "inc"
     },
     {
       "id": 40,
       "name": "Sell own phone",
       "amount": 5000,
-      "createdAt": "2024-01-24T16:21:29+03:00",
+      "createdAt": 1706346528,
       "type": "inc"
     },
     {
       "id": 41,
       "name": "Salary",
       "amount": 50000,
-      "createdAt": "2024-01-24T16:21:29+03:00",
+      "createdAt": 1706346528,
       "type": "inc"
     }
   ]
