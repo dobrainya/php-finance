@@ -21,28 +21,26 @@ class AmountRepository extends ServiceEntityRepository
         parent::__construct($registry, Amount::class);
     }
 
-    //    /**
-    //     * @return Amount[] Returns an array of Amount objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * @return array<Amount>
+     */
+    public function findByCategoryCode(string $categoryCode): array
+    {
+        $sql = <<<SQL
+SELECT a.id
+FROM amount a
+    JOIN reference r ON r.id = a.type_id
+WHERE r.code = :code
+SQL;
 
-    //    public function findOneBySomeField($value): ?Amount
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $ids = $this->getEntityManager()->getConnection()->executeQuery($sql, [
+            'code' => $categoryCode,
+        ])->fetchFirstColumn();
+
+        if ([] === $ids) {
+            return [];
+        }
+
+        return $this->findBy(['id' => $ids]);
+    }
 }

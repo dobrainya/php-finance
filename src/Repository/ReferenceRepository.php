@@ -21,28 +21,13 @@ class ReferenceRepository extends ServiceEntityRepository
         parent::__construct($registry, Reference::class);
     }
 
-    //    /**
-    //     * @return Reference[] Returns an array of Reference objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function existsByCode(string $code): bool
+    {
+        return 0 !== $this->count(['code' => $code]);
+    }
 
-    //    public function findOneBySomeField($value): ?Reference
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findOneByCode(string $code): ?Reference
+    {
+        return $this->findOneBy(['code' => $code]);
+    }
 }

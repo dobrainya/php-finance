@@ -10,19 +10,18 @@ use App\Model\AmountListResponse;
 use App\Repository\AmountRepository;
 use App\Repository\ReferenceRepository;
 use App\Service\AmountService;
+use App\Tests\AbstractTestCase;
 use Doctrine\ORM\EntityManager;
-use PHPUnit\Framework\TestCase;
 
-class AmountTest extends TestCase
+class AmountTest extends AbstractTestCase
 {
-
-    public function testGetIncomesWithIncorrectCategory()
+    public function testGetCategoryNotFoundException()
     {
         $refRepository = $this->createMock(ReferenceRepository::class);
         $refRepository->expects($this->once())
-            ->method('findOneBy')
+            ->method('existsByCode')
             ->withAnyParameters()
-            ->willReturn(null);
+            ->willReturn(false);
 
         $service = new AmountService(
             $this->createMock(AmountRepository::class),
@@ -36,64 +35,54 @@ class AmountTest extends TestCase
 
     public function testGetIncomesByCategory(): void
     {
-        $incomeRef = (new Reference())->setId(1)->setName('Income')->setCode('inc');
         $amounts = [
-            (new Amount())->setId(1)->setName('Sell own car')->setAmount(500000.00)->setType($incomeRef)->setCreatedAt(new \DateTime()),
-            (new Amount())->setId(2)->setName('Sell own phone')->setAmount(5000.00)->setType($incomeRef)->setCreatedAt(new \DateTime()),
-            (new Amount())->setId(3)->setName('Salary')->setAmount(50000.00)->setType($incomeRef)->setCreatedAt(new \DateTime()),
+            (new Amount())->setName('Amount 1')->setAmount(500000.00)->setCreatedAt(new \DateTime()),
+            (new Amount())->setName('Amount 2')->setAmount(5000.00)->setCreatedAt(new \DateTime()),
+            (new Amount())->setName('Amount 3')->setAmount(50000.00)->setCreatedAt(new \DateTime()),
         ];
 
-        $amountRepository = $this->createMock(AmountRepository::class);
-
-        $amountRepository->expects($this->once())
-        ->method('findBy')
-        ->with(['type' => $incomeRef])
-        ->willReturn($amounts);
-
-        $refRepository = $this->createMock(ReferenceRepository::class);
-
-        $refRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['code' => 'inc'])
-            ->willReturn($incomeRef);
-
-        $entityManager = $this->createMock(EntityManager::class);
-
-        $entityManager->method('persist')->withAnyParameters();
-        $entityManager->method('flush')->withAnyParameters();
-
-        $service = new AmountService($amountRepository, $refRepository, $entityManager);
-
-        $expected = new AmountListResponse(array_map(
-            fn (Amount $amount) => AmountItem::createFromEntity($amount),
-            $amounts
-        ));
-
-        $this->assertEquals($expected, $service->getAmountsByCategory('inc'));
+        $this->amountListTest($amounts, 'inc');
     }
 
     public function testGetExpensesByCategory(): void
     {
-        $expenseRef = (new Reference())->setId(1)->setName('Expense')->setCode('exp');
         $amounts = [
-            (new Amount())->setId(1)->setName('Expense 1')->setAmount(100.00)->setType($expenseRef)->setCreatedAt(new \DateTime()),
-            (new Amount())->setId(2)->setName('Expense 2')->setAmount(2.00)->setType($expenseRef)->setCreatedAt(new \DateTime()),
-            (new Amount())->setId(3)->setName('Expense 3')->setAmount(34.00)->setType($expenseRef)->setCreatedAt(new \DateTime()),
+            (new Amount())->setName('Amount 1')->setAmount(500000.00)->setCreatedAt(new \DateTime()),
+            (new Amount())->setName('Amount 2')->setAmount(5000.00)->setCreatedAt(new \DateTime()),
+            (new Amount())->setName('Amount 3')->setAmount(50000.00)->setCreatedAt(new \DateTime()),
         ];
+
+        $this->amountListTest($amounts, 'exp');
+    }
+
+    /**
+     * @param array<Amount> $amounts
+     *
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    private function amountListTest(array $amounts, string $categoryCode)
+    {
+        $categoryCode = 'inc';
+
+        $reference = (new Reference())->setId(1)->setName('Income')->setCode($categoryCode);
+        foreach ($amounts as $idx => $amount) {
+            $this->setEntityId($amount, $idx + 1);
+            $amount->setType($reference);
+        }
 
         $amountRepository = $this->createMock(AmountRepository::class);
 
         $amountRepository->expects($this->once())
-            ->method('findBy')
-            ->with(['type' => $expenseRef])
+            ->method('findByCategoryCode')
+            ->with($categoryCode)
             ->willReturn($amounts);
 
         $refRepository = $this->createMock(ReferenceRepository::class);
 
         $refRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['code' => 'exp'])
-            ->willReturn($expenseRef);
+            ->method('existsByCode')
+            ->with($categoryCode)
+            ->willReturn(true);
 
         $entityManager = $this->createMock(EntityManager::class);
 
@@ -107,6 +96,6 @@ class AmountTest extends TestCase
             $amounts
         ));
 
-        $this->assertEquals($expected, $service->getAmountsByCategory('exp'));
+        $this->assertEquals($expected, $service->getAmountsByCategory($categoryCode));
     }
 }

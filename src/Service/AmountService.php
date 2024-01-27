@@ -21,21 +21,15 @@ class AmountService
     ) {
     }
 
-    public function getAmountsByCategory(string $category): AmountListResponse
+    public function getAmountsByCategory(string $code): AmountListResponse
     {
-        $reference = $this->referenceRepository->findOneBy([
-            'code' => $category,
-        ]);
-
-        if (!$reference) {
+        if (!$this->referenceRepository->existsByCode($code)) {
             throw new CategoryNotFoundException();
         }
 
-        $data = $this->amountRepository->findBy(['type' => $reference]);
-
         $data = array_map(
             fn (Amount $amount) => AmountItem::createFromEntity($amount),
-            $data
+            $this->amountRepository->findByCategoryCode($code)
         );
 
         return new AmountListResponse($data);
@@ -45,11 +39,7 @@ class AmountService
     {
         $category = $request->request->get('type');
 
-        $reference = $this->referenceRepository->findOneBy([
-            'code' => $category,
-        ]);
-
-        if (!$reference) {
+        if (!$this->referenceRepository->existsByCode($category)) {
             throw new CategoryNotFoundException();
         }
 
@@ -61,7 +51,7 @@ class AmountService
 
         $value = $request->request->get('amount');
         $amount->setAmount($value);
-        $amount->setType($reference);
+        $amount->setType($this->referenceRepository->findOneByCode($category));
 
         $this->entityManager->persist($amount);
         $this->entityManager->flush();

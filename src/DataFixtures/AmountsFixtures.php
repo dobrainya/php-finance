@@ -16,13 +16,13 @@ class AmountsFixtures extends Fixture implements DependentFixtureInterface
 
         $createdAt = \DateTime::createFromFormat('U', '1706346528', new \DateTimeZone('Europe/Moscow'));
 
-        $manager->persist((new Amount())->setId(1)->setName('Sell own car')->setAmount(500000.00)->setType($incomeRef)->setCreatedAt(clone $createdAt));
-        $manager->persist((new Amount())->setId(2)->setName('Sell own phone')->setAmount(5000.00)->setType($incomeRef)->setCreatedAt(clone $createdAt));
-        $manager->persist((new Amount())->setId(3)->setName('Salary')->setAmount(50000.00)->setType($incomeRef)->setCreatedAt(clone $createdAt));
+        $manager->persist((new Amount())->setName('Sell own car')->setAmount(500000.00)->setType($incomeRef)->setCreatedAt(clone $createdAt));
+        $manager->persist((new Amount())->setName('Sell own phone')->setAmount(5000.00)->setType($incomeRef)->setCreatedAt(clone $createdAt));
+        $manager->persist((new Amount())->setName('Salary')->setAmount(50000.00)->setType($incomeRef)->setCreatedAt(clone $createdAt));
 
-        $manager->persist((new Amount())->setId(4)->setName('Taxes')->setAmount(500.00)->setType($expenseRef)->setCreatedAt(clone $createdAt));
-        $manager->persist((new Amount())->setId(5)->setName('Meals')->setAmount(200.00)->setType($expenseRef)->setCreatedAt(clone $createdAt));
-        $manager->persist((new Amount())->setId(6)->setName('Groceries')->setAmount(60.00)->setType($expenseRef)->setCreatedAt(clone $createdAt));
+        $manager->persist((new Amount())->setName('Taxes')->setAmount(500.00)->setType($expenseRef)->setCreatedAt(clone $createdAt));
+        $manager->persist((new Amount())->setName('Meals')->setAmount(200.00)->setType($expenseRef)->setCreatedAt(clone $createdAt));
+        $manager->persist((new Amount())->setName('Groceries')->setAmount(60.00)->setType($expenseRef)->setCreatedAt(clone $createdAt));
 
         $manager->flush();
     }
