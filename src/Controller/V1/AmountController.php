@@ -3,8 +3,9 @@
 namespace App\Controller\V1;
 
 use App\Entity\Amount;
-use App\Exception\CategoryNotFoundException;
+use App\Model\AmountItemResponse;
 use App\Model\AmountListResponse;
+use App\Model\ErrorResponse;
 use App\Service\AmountService;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -21,32 +22,51 @@ class AmountController extends AbstractController
     {
     }
 
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Create new amount",
+     *
+     *     @Model(type=AmountItemResponse::class)
+     * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Category not found",
+     *
+     *     @Model(type=ErrorResponse::class)
+     * )
+     */
     #[Route('/', name: 'create_', methods: ['post'])]
     public function create(Request $request): JsonResponse
     {
-        try {
-            return $this->json($this->amountService->create($request));
-        } catch (CategoryNotFoundException $e) {
-            return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
-        }
+        return $this->json($this->amountService->create($request));
     }
 
     /**
-     * @OA\Response(response=200, description="Get list of incomes", @Model(type=AmountListResponse::class))
+     * @OA\Response(
+     *     response=200,
+     *     description="Get list of amounts by category",
+     *
+     *     @Model(type=AmountListResponse::class)
+     * )
+     *
+     * @OA\Response(
+     *     response=404,
+     *     description="Category not found",
+     *
+     *     @Model(type=ErrorResponse::class)
+     * )
      */
     #[Route(
         '/{category}',
         name: 'amounts_by_category_',
-        requirements: ['category' => '(exp|inc)'],
+        requirements: ['category' => '(exp|inc|test)'],
         methods: ['get']
     )]
     public function incomes(Request $request): JsonResponse
     {
-        try {
-            return $this->json($this->amountService->getAmountsByCategory($request->attributes->get('category')));
-        } catch (CategoryNotFoundException $e) {
-            return $this->json(['success' => false, 'message' => $e->getMessage()], $e->getCode());
-        }
+        return $this->json($this->amountService->getAmountsByCategory($request->attributes->get('category')));
     }
 
     #[Route(
@@ -60,6 +80,12 @@ class AmountController extends AbstractController
         return $this->json('');
     }
 
+    /**
+     * @OA\Response(
+     *     response=200,
+     *     description="Update amount by id",
+     * )
+     */
     #[Route(
         '/{id}',
         name: 'update_',
@@ -68,6 +94,7 @@ class AmountController extends AbstractController
     )]
     public function update(Amount $amount, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
+        // todo: перенести логику в AmountService
         $amount->setName($request->request->get('name'));
         $amount->setAmount($request->request->get('amount'));
         $entityManager->flush();

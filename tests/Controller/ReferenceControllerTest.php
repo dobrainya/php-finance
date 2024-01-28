@@ -2,7 +2,6 @@
 
 namespace App\Tests\Controller;
 
-use App\Entity\Amount;
 use App\Entity\Reference;
 use App\Tests\AbstractControllerTest;
 
