@@ -2,10 +2,12 @@
 
 namespace App\Controller\V1;
 
+use App\Attribute\RequestBody;
 use App\Entity\Amount;
 use App\Model\AmountItemResponse;
 use App\Model\AmountListResponse;
 use App\Model\ErrorResponse;
+use App\Model\Request\AmountCreateRequest;
 use App\Service\AmountService;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -23,11 +25,20 @@ class AmountController extends AbstractController
     }
 
     /**
+     * @OA\RequestBody(@Model(type=AmountCreateRequest::class))
+     *
      * @OA\Response(
      *     response=200,
      *     description="Create new amount",
      *
      *     @Model(type=AmountItemResponse::class)
+     * )
+     *
+     * @OA\Response(
+     *     response=400,
+     *     description="Violation failed",
+     *
+     *     @Model(type=ErrorResponse::class)
      * )
      *
      * @OA\Response(
@@ -38,7 +49,7 @@ class AmountController extends AbstractController
      * )
      */
     #[Route('/', name: 'create_', methods: ['post'])]
-    public function create(Request $request): JsonResponse
+    public function create(#[RequestBody] AmountCreateRequest $request): JsonResponse
     {
         return $this->json($this->amountService->create($request));
     }

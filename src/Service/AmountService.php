@@ -7,10 +7,10 @@ use App\Exception\CategoryNotFoundException;
 use App\Model\AmountItem;
 use App\Model\AmountItemResponse;
 use App\Model\AmountListResponse;
+use App\Model\Request\AmountCreateRequest;
 use App\Repository\AmountRepository;
 use App\Repository\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 
 class AmountService
 {
@@ -35,23 +35,18 @@ class AmountService
         return new AmountListResponse($data);
     }
 
-    public function create(Request $request): AmountItemResponse
+    public function create(AmountCreateRequest $request): AmountItemResponse
     {
-        $category = $request->request->get('type');
-
-        if (!$this->referenceRepository->existsByCode($category)) {
+        if (!$this->referenceRepository->existsByCode($request->getType())) {
             throw new CategoryNotFoundException();
         }
 
         $amount = new Amount();
         $amount->setCreatedAt(new \DateTime());
 
-        $name = $request->request->get('name');
-        $amount->setName($name);
-
-        $value = $request->request->get('amount');
-        $amount->setAmount($value);
-        $amount->setType($this->referenceRepository->findOneByCode($category));
+        $amount->setName($request->getName());
+        $amount->setAmount($request->getAmount());
+        $amount->setType($this->referenceRepository->findOneByCode($request->getType()));
 
         $this->entityManager->persist($amount);
         $this->entityManager->flush();
