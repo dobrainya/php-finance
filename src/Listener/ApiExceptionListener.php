@@ -16,9 +16,10 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ApiExceptionListener
 {
     public function __construct(
-        private ExceptionMappingResolver $exceptionMappingResolver,
-        private LoggerInterface $logger,
-        private SerializerInterface $serializer
+        private readonly ExceptionMappingResolver $exceptionMappingResolver,
+        private readonly LoggerInterface $logger,
+        private readonly SerializerInterface $serializer,
+        private readonly bool $isDebug
     ) {
     }
 
@@ -48,7 +49,11 @@ class ApiExceptionListener
             ? Response::$statusTexts[$mapping->getCode()]
             : $throwable->getMessage();
 
-        $data = $this->serializer->serialize(new ErrorResponse($message), JsonEncoder::FORMAT);
+        $details = $this->isDebug ? [
+            'trace' => $throwable->getTraceAsString(),
+        ] : null;
+
+        $data = $this->serializer->serialize(new ErrorResponse($message, $details), JsonEncoder::FORMAT);
 
         $event->setResponse(new JsonResponse($data, $mapping->getCode(), [], true));
     }

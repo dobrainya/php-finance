@@ -7,8 +7,11 @@ class ExceptionMappingResolver
     /**
      * @var ExceptionMapping[]
      */
-    private array $mappings;
+    private array $mappings = [];
 
+    /**
+     * @param ExceptionMapping[] $mappings
+     */
     public function __construct(array $mappings)
     {
         foreach ($mappings as $class => $mapper) {
