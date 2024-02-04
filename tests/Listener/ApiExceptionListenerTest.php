@@ -3,6 +3,7 @@
 namespace App\Tests\Listener;
 
 use App\Listener\ApiExceptionListener;
+use App\Model\ErrorDebugDetails;
 use App\Model\ErrorResponse;
 use App\Service\ExceptionHandler\ExceptionMapping;
 use App\Service\ExceptionHandler\ExceptionMappingResolver;
@@ -158,7 +159,7 @@ class ApiExceptionListenerTest extends AbstractTestCase
     {
         $mapping = new ExceptionMapping(Response::HTTP_NOT_FOUND, true, false);
         $responseMessage = Response::$statusTexts[$mapping->getCode()];
-        $responseBody = json_encode(['error' => $responseMessage, 'trace' => 'something']);
+        $responseBody = json_encode(['message' => $responseMessage, ['details' => ['trace' => 'something']]]);
 
         $this->resolver->expects($this->once())
             ->method('resolve')
@@ -169,7 +170,9 @@ class ApiExceptionListenerTest extends AbstractTestCase
             ->method('serialize')
             ->with(
                 $this->callback(
-                    fn (ErrorResponse $errorResponse) => $errorResponse->getMessage() === $responseMessage && !empty($errorResponse->getDetails()['trace'])
+                    fn (ErrorResponse $errorResponse) => $errorResponse->getMessage() === $responseMessage
+                        && $errorResponse->getDetails() instanceof ErrorDebugDetails
+                        && !empty($errorResponse->getDetails()->getTrace())
                 ), JsonEncoder::FORMAT)
             ->willReturn($responseBody);
 
